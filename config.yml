@@ -1,0 +1,8 @@
+bot:
+  token: "YOUR_BOT_TOKEN_HERE"
+  name: "bagbot7"
+  
+commands:
+  start: "Hello! I'm bagbot7. How can I help you?"
+  help: "Available commands: /start, /help, /status"
+  status: "Bot is running!"
