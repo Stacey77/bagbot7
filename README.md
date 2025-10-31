@@ -5,8 +5,12 @@ A simple Telegram bot implementation.
 ## Features
 
 - Basic command handling (/start, /help, /status)
+- Interactive inline keyboard buttons for quick actions
+- Random joke generator (/joke)
+- Inspirational quote generator (/quote)
+- Basic calculator (/calc)
 - Message echoing
-- Configurable responses
+- Configurable responses, jokes, and quotes
 - Error handling and logging
 
 ## Setup
@@ -31,6 +35,8 @@ Edit `config.yml` to customize:
 - Bot token
 - Bot name
 - Command responses
+- Custom jokes (add your own to the `jokes` list)
+- Custom quotes (add your own to the `quotes` list)
 
 Alternatively, set the `BOT_TOKEN` environment variable:
 ```bash
@@ -40,9 +46,12 @@ python bot.py
 
 ## Commands
 
-- `/start` - Start interaction with the bot
+- `/start` - Start interaction with the bot (includes interactive buttons)
 - `/help` - Show available commands
 - `/status` - Check bot status
+- `/joke` - Get a random joke
+- `/quote` - Get an inspirational quote
+- `/calc <expression>` - Calculate a math expression (e.g., `/calc 2+2` or `/calc 10*5-3`)
 
 ## Development
 
