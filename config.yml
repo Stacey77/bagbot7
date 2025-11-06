@@ -1,0 +1,34 @@
+bot:
+  token: "YOUR_BOT_TOKEN_HERE"
+  name: "bagbot7"
+  
+commands:
+  start: "Hello! I'm bagbot7. Use /help to see what I can do!"
+  help: |
+    Available commands:
+    /start - Start interaction with the bot
+    /help - Show this help message
+    /status - Check bot status
+    /dashboard - Open interactive dashboard with stats
+    /joke - Get a random joke
+    /quote - Get an inspirational quote
+    /calc <expression> - Calculate a math expression (e.g., /calc 2+2)
+  status: "✅ Bot is running smoothly!"
+
+jokes:
+  - "Why don't scientists trust atoms? Because they make up everything!"
+  - "Why did the scarecrow win an award? He was outstanding in his field!"
+  - "Why don't eggs tell jokes? They'd crack each other up!"
+  - "What do you call a bear with no teeth? A gummy bear!"
+  - "Why did the math book look so sad? Because it had too many problems!"
+  - "What do you call a fake noodle? An impasta!"
+  - "Why did the bicycle fall over? It was two tired!"
+
+quotes:
+  - "The only way to do great work is to love what you do. - Steve Jobs"
+  - "Innovation distinguishes between a leader and a follower. - Steve Jobs"
+  - "Life is 10% what happens to you and 90% how you react to it. - Charles R. Swindoll"
+  - "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt"
+  - "Success is not final, failure is not fatal: it is the courage to continue that counts. - Winston Churchill"
+  - "Believe you can and you're halfway there. - Theodore Roosevelt"
+  - "The best time to plant a tree was 20 years ago. The second best time is now. - Chinese Proverb"
