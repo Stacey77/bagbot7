@@ -29,6 +29,15 @@ class BagBot:
         self.jokes = self.config.get('jokes', self.get_default_jokes())
         self.quotes = self.config.get('quotes', self.get_default_quotes())
         
+        # Track bot statistics
+        self.stats = {
+            'messages_received': 0,
+            'commands_executed': 0,
+            'jokes_told': 0,
+            'quotes_shared': 0,
+            'calculations_performed': 0
+        }
+        
         if not self.token or self.token == "YOUR_BOT_TOKEN_HERE":
             raise ValueError("Bot token not configured. Set BOT_TOKEN env variable or update config.yml")
     
@@ -78,11 +87,13 @@ class BagBot:
     
     async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /help command"""
+        self.stats['commands_executed'] += 1
         message = self.commands.get('help', 
             'Available commands:\n'
             '/start - Start interaction with the bot\n'
             '/help - Show this help message\n'
             '/status - Check bot status\n'
+            '/dashboard - Open interactive dashboard\n'
             '/joke - Get a random joke\n'
             '/quote - Get an inspirational quote\n'
             '/calc <expression> - Calculate a math expression (e.g., /calc 2+2)')
@@ -90,21 +101,60 @@ class BagBot:
     
     async def status_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /status command"""
+        self.stats['commands_executed'] += 1
         message = self.commands.get('status', '✅ Bot is running smoothly!')
         await update.message.reply_text(message)
     
+    async def dashboard_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handle /dashboard command - shows interactive dashboard"""
+        self.stats['commands_executed'] += 1
+        
+        # Build dashboard message with stats
+        dashboard_text = (
+            "🎯 *bagbot7 Dashboard*\n\n"
+            "📊 *Statistics*\n"
+            f"• Messages Received: {self.stats['messages_received']}\n"
+            f"• Commands Executed: {self.stats['commands_executed']}\n"
+            f"• Jokes Told: {self.stats['jokes_told']}\n"
+            f"• Quotes Shared: {self.stats['quotes_shared']}\n"
+            f"• Calculations Performed: {self.stats['calculations_performed']}\n\n"
+            "🎮 *Quick Actions*\n"
+            "Use the buttons below to interact with the bot:"
+        )
+        
+        # Create interactive keyboard for dashboard
+        keyboard = [
+            [InlineKeyboardButton("😄 Random Joke", callback_data='dashboard_joke'),
+             InlineKeyboardButton("💭 Random Quote", callback_data='dashboard_quote')],
+            [InlineKeyboardButton("📊 Bot Status", callback_data='dashboard_status'),
+             InlineKeyboardButton("📋 Help", callback_data='dashboard_help')],
+            [InlineKeyboardButton("🔄 Refresh Stats", callback_data='dashboard_refresh')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await update.message.reply_text(
+            dashboard_text, 
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
     async def joke_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /joke command"""
+        self.stats['commands_executed'] += 1
+        self.stats['jokes_told'] += 1
         joke = random.choice(self.jokes)
         await update.message.reply_text(f"😄 {joke}")
     
     async def quote_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /quote command"""
+        self.stats['commands_executed'] += 1
+        self.stats['quotes_shared'] += 1
         quote = random.choice(self.quotes)
         await update.message.reply_text(f"💭 {quote}")
     
     async def calc_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /calc command for basic calculations"""
+        self.stats['commands_executed'] += 1
         try:
             if not context.args:
                 await update.message.reply_text(
@@ -120,6 +170,7 @@ class BagBot:
                 return
             
             result = eval(expression)
+            self.stats['calculations_performed'] += 1
             await update.message.reply_text(f"🔢 {expression} = {result}")
         except Exception as e:
             logger.error(f"Calculation error: {e}")
@@ -135,6 +186,7 @@ class BagBot:
                       '/start - Start interaction with the bot\n'
                       '/help - Show this help message\n'
                       '/status - Check bot status\n'
+                      '/dashboard - Open interactive dashboard\n'
                       '/joke - Get a random joke\n'
                       '/quote - Get an inspirational quote\n'
                       '/calc <expression> - Calculate a math expression')
@@ -142,14 +194,67 @@ class BagBot:
         elif query.data == 'status':
             await query.edit_message_text(text='✅ Bot is running smoothly!')
         elif query.data == 'joke':
+            self.stats['jokes_told'] += 1
             joke = random.choice(self.jokes)
             await query.edit_message_text(text=f"😄 {joke}")
         elif query.data == 'quote':
+            self.stats['quotes_shared'] += 1
             quote = random.choice(self.quotes)
             await query.edit_message_text(text=f"💭 {quote}")
+        # Dashboard callbacks
+        elif query.data == 'dashboard_joke':
+            self.stats['jokes_told'] += 1
+            joke = random.choice(self.jokes)
+            await query.edit_message_text(text=f"😄 *Random Joke*\n\n{joke}", parse_mode='Markdown')
+        elif query.data == 'dashboard_quote':
+            self.stats['quotes_shared'] += 1
+            quote = random.choice(self.quotes)
+            await query.edit_message_text(text=f"💭 *Inspirational Quote*\n\n{quote}", parse_mode='Markdown')
+        elif query.data == 'dashboard_status':
+            await query.edit_message_text(text='✅ *Bot Status*\n\nBot is running smoothly!', parse_mode='Markdown')
+        elif query.data == 'dashboard_help':
+            message = ('📋 *Help Menu*\n\n'
+                      'Available commands:\n'
+                      '• /start - Start interaction\n'
+                      '• /help - Show help\n'
+                      '• /status - Check status\n'
+                      '• /dashboard - Open dashboard\n'
+                      '• /joke - Random joke\n'
+                      '• /quote - Random quote\n'
+                      '• /calc - Calculate expression')
+            await query.edit_message_text(text=message, parse_mode='Markdown')
+        elif query.data == 'dashboard_refresh':
+            # Refresh dashboard with updated stats
+            dashboard_text = (
+                "🎯 *bagbot7 Dashboard*\n\n"
+                "📊 *Statistics*\n"
+                f"• Messages Received: {self.stats['messages_received']}\n"
+                f"• Commands Executed: {self.stats['commands_executed']}\n"
+                f"• Jokes Told: {self.stats['jokes_told']}\n"
+                f"• Quotes Shared: {self.stats['quotes_shared']}\n"
+                f"• Calculations Performed: {self.stats['calculations_performed']}\n\n"
+                "🎮 *Quick Actions*\n"
+                "Use the buttons below to interact with the bot:"
+            )
+            
+            keyboard = [
+                [InlineKeyboardButton("😄 Random Joke", callback_data='dashboard_joke'),
+                 InlineKeyboardButton("💭 Random Quote", callback_data='dashboard_quote')],
+                [InlineKeyboardButton("📊 Bot Status", callback_data='dashboard_status'),
+                 InlineKeyboardButton("📋 Help", callback_data='dashboard_help')],
+                [InlineKeyboardButton("🔄 Refresh Stats", callback_data='dashboard_refresh')]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await query.edit_message_text(
+                text=dashboard_text,
+                reply_markup=reply_markup,
+                parse_mode='Markdown'
+            )
     
     async def echo_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Echo received messages"""
+        self.stats['messages_received'] += 1
         user_message = update.message.text
         logger.info(f"Received message: {user_message}")
         await update.message.reply_text(f"You said: {user_message}")
@@ -169,6 +274,7 @@ class BagBot:
         application.add_handler(CommandHandler("start", self.start_command))
         application.add_handler(CommandHandler("help", self.help_command))
         application.add_handler(CommandHandler("status", self.status_command))
+        application.add_handler(CommandHandler("dashboard", self.dashboard_command))
         application.add_handler(CommandHandler("joke", self.joke_command))
         application.add_handler(CommandHandler("quote", self.quote_command))
         application.add_handler(CommandHandler("calc", self.calc_command))

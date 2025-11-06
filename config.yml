@@ -9,6 +9,7 @@ commands:
     /start - Start interaction with the bot
     /help - Show this help message
     /status - Check bot status
+    /dashboard - Open interactive dashboard with stats
     /joke - Get a random joke
     /quote - Get an inspirational quote
     /calc <expression> - Calculate a math expression (e.g., /calc 2+2)
